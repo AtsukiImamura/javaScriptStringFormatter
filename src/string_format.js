@@ -1,13 +1,9 @@
 function formatString(str, ...args) {
-    // console.log(' [formatString] str = ' + str)
-    // console.log(' [formatString] args = ')
-    // console.log(args)
 
-    let matches = str.match(new RegExp('\%([0-9]+\@)?(#[ox])?(\.?[0-9]+)?[doxcsefb]', "g"))
+    let matches = str.match(new RegExp('\%([0-9]+\@)?(#[ox])?-?([1-9][0-9]*)?(\.?[1-9][0-9]*)?[doxsbf]', "g"))
     if (matches == null || matches.length == 0) {
         return str
     }
-    // console.log(matches)
 
     // 可変長引数の部分にどれだけ値が必要かを検査する
     let pointedArgsList = { 'none': [] }
@@ -26,11 +22,8 @@ function formatString(str, ...args) {
         pointedArgsList[argIndex].push(index)
     })
 
-    // console.log('pointedArgsList:')
-    // console.log(pointedArgsList)
-
     if (args.length < Object.keys(pointedArgsList).length) {
-        return "引数が少なすぎる"
+        return "args are not enough."
         // ERROR 
     }
 
@@ -46,18 +39,25 @@ function formatString(str, ...args) {
             let formatedArg = null;
 
             // 書式指定子ごとに処理する
-            switch (match.substr(match.length - 1, 1)) {
-                case 'd': // 数値
-                    formatedArg = Math.floor(Number(arg)) + ''
-                    if (match.match('[1-9]+d')) {
+            let formatType = match.substr(match.length - 1, 1)
+            switch (formatType) {
+                case 'f': // 小数
+                case 'd': // 整数
+                    formatedArg = Number(arg)
+                    if(formatType == 'd'){
+                        formatedArg = Math.floor(formatedArg)
+                    }
+                    formatedArg = formatedArg + ''
+                    
+                    if (match.match(/[1-9][0-9]*[df]/)) {
 
                         let stuff = ' '; // パッド
-                        let s = match.search('[1-9]+d') // フォーマット後の出力長を定義している文字列開始位置
+                        let s = match.search(/[1-9][0-9]*[df]/) // フォーマット後の出力長を定義している文字列開始位置
                         let totalLength = Number(match.substring(s, match.length - 1)) // フォーマット後の出力長
                         let repeatNum = totalLength - formatedArg.length // パッドを繰り返すべき回数
 
                         // ゼロ埋め
-                        if (match.match('0[1-9]+d')) {
+                        if (match.match(/0[1-9][0-9]*[df]/)) {
                             stuff = '0'
                             formatedArg = stuff.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
 
@@ -65,7 +65,7 @@ function formatString(str, ...args) {
                         // スペース埋め
                         else {
                             // 左寄せ
-                            if (match.match('-.*d')) {
+                            if (match.match(/-.*[df]/)) {
                                 formatedArg = stuff.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
                             }
                             // 右寄せ
@@ -74,7 +74,7 @@ function formatString(str, ...args) {
                             }
                         }
                         // 精度（最大表示幅）指定がある場合はカットする
-                        if (match.match('\.[1-9]+d')) {
+                        if (match.match(/\.[1-9][0-9]*[df]/)) {
                             formatedArg = formatedArg.substr(0, totalLength)
                         }
                     } else {
@@ -85,24 +85,36 @@ function formatString(str, ...args) {
                     break
                 case 'x':
                     break
-                case 'c':
-                    break
                 case 's': // 文字列
                     if (typeof arg != 'string') {
                         // Error
                     }
                     formatedArg = arg
-                    break
-                case 'f':
+
+                    if (match.match(/[1-9][0-9]*s/)) {
+                        let s = match.search(/[1-9][0-9]*s/) // フォーマット後の出力長を定義している文字列開始位置
+                        let totalLength = Number(match.substring(s, match.length - 1)) // フォーマット後の出力長
+                        let repeatNum = totalLength - formatedArg.length // パッドを繰り返すべき回数
+
+                        if (match.match(/-.*s/)) {
+                            formatedArg = ' '.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
+                        }
+                        // 右寄せ
+                        else {
+                            formatedArg += ' '.repeat(repeatNum > 0 ? repeatNum : 0)
+                        }
+
+                        if (match.match(/\.[1-9][0-9]*s/)) {
+                            formatedArg = formatedArg.substr(0, totalLength)
+                        }
+                    }
+
                     break
                 default:
                 // ERROR
             }
-            // console.log('pointIdx = ' + pointIdx + '  matchIdx = ' + matchIdx + '  arg = ' + arg + '  match = ' + match + '  matchStartAt = ' + matchStartAt)
-
             let matchStartAt = str.search(match)
             str = str.substring(0, matchStartAt) + formatedArg + str.substring(matchStartAt + match.length)
-            // console.log('   => ' + str)
         })
     })
 
@@ -110,9 +122,15 @@ function formatString(str, ...args) {
     return str
 }
 
-// matches = "%2@d".match(new RegExp('[0-9]+\@', "g"))
-// console.log(matches)
-
-let formattedStr = formatString('hoge%4d*%.6d', 3, 1234567890)
+let formattedStr = formatString('hoge%-6.4s*%.6f', 'foobarbaz', 1234.567890)
 console.log('formattedStr = ' + formattedStr)
+
+// let date = new Date()
+// console.log('[start] '+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()+':'+date.getMilliseconds())
+// for(let i = 0; i < 200000; i++){
+//     let formattedStr = formatString('hoge%-6.4s*%12f', 'foobarbaz', 1234.567890)
+// }
+
+// date = new Date()
+// console.log('[start] '+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()+':'+date.getMilliseconds())
 
