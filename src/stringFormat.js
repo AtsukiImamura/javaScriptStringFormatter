@@ -1,6 +1,6 @@
-function formatString(str, ...args) {
+export default function(str, ...args) {
 
-    let matches = str.match(new RegExp('\%([0-9]+\@)?(#[ox])?-?([1-9][0-9]*)?(\.?[1-9][0-9]*)?[doxsbf]', "g"))
+    let matches = str.match(new RegExp('\%([0-9]+\@)?(#[ox])?[-0]?([1-9][0-9]*)?(\.?[1-9][0-9]*)?[doxsbf]', "g"))
     if (matches == null || matches.length == 0) {
         return str
     }
@@ -98,21 +98,19 @@ function formatString(str, ...args) {
                     formatedArg = formatedArg.substr(0, maxLength)    
                 }
 
-                let stuff = ' '
-                if(match.match(/0[1-9][0-9]*(\.[1-9][0-9]*)?[doxsbf]/)){
-                    stuff = '0'
-                }
-
                 let repeatNum = minLength - formatedArg.length // パッドを繰り返すべき回数
-                console.log('match = '+match+'  repeatNum = '+repeatNum+'  minLength = '+minLength)
 
                 // 右寄せ
-                if (match.match(/-.*[doxsbf]/) || stuff == '0') {
-                    formatedArg = stuff.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
+                if (match.match(/-[1-9][0-9]*(\.[1-9][0-9]*)?[doxsbf]/)) {
+                    formatedArg = ' '.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
+                }
+                // ゼロ埋め（&右詰め）
+                else if(match.match(/0[1-9][0-9]*(\.[1-9][0-9]*)?[doxsbf]/)){
+                    formatedArg = '0'.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
                 }
                 // 左寄せ
                 else {
-                    formatedArg += stuff.repeat(repeatNum > 0 ? repeatNum : 0)
+                    formatedArg += ' '.repeat(repeatNum > 0 ? repeatNum : 0)
                 }
             }
 
@@ -124,16 +122,4 @@ function formatString(str, ...args) {
 
     return str
 }
-
-let formattedStr = formatString('hoge%-8.4s@@%08d', 'xyzab', 1234)
-console.log('formattedStr = ' + formattedStr)
-
-// let date = new Date()
-// console.log('[start] '+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()+':'+date.getMilliseconds())
-// for(let i = 0; i < 200000; i++){
-//     let formattedStr = formatString('hoge%-6.4s*%12f', 'foobarbaz', 1234.567890)
-// }
-
-// date = new Date()
-// console.log('[start] '+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()+':'+date.getMilliseconds())
 

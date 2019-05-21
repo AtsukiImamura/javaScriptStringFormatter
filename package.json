@@ -1,0 +1,36 @@
+{
+  "name": "javascript-string-formatter",
+  "version": "1.0.0",
+  "description": "javascriptでjavaの `String.format()` のような機能を実現する",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack -p",
+    "w-version": "webpack --version"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AtsukiImamura/javaScriptStringFormatter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AtsukiImamura/javaScriptStringFormatter/issues"
+  },
+  "homepage": "https://github.com/AtsukiImamura/javaScriptStringFormatter#readme",
+  "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/preset-env": "^7.4.4",
+    "babel-loader": "^8.0.5",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1"
+  },
+  "dependencies": {},
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  }
+}
