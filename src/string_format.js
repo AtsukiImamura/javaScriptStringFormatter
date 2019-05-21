@@ -53,8 +53,10 @@ function formatString(str, ...args) {
                     }
                     formatedArg = Math.floor(Number(arg)) + ''
                 case 'o':
+                    formatedArg = arg.toString(8)
                     break
                 case 'x':
+                    formatedArg = arg.toString(16)
                     break
                 case 's': // 文字列
                     if (typeof arg != 'string') {
@@ -95,6 +97,11 @@ function formatString(str, ...args) {
                     formatedArg = formatedArg.substr(0, maxLength)    
                 }
 
+                let stuff = ' '
+                if(false){
+                    stuff = '0'
+                }
+
                 let repeatNum = minLength - formatedArg.length // パッドを繰り返すべき回数
 
                 // 右寄せ
@@ -116,7 +123,7 @@ function formatString(str, ...args) {
     return str
 }
 
-let formattedStr = formatString('hoge%-8.4s@@%.8f', 'xyzab', 1234.567890)
+let formattedStr = formatString('hoge%-8.4s@@%.8x', 'xyzab', 1234)
 console.log('formattedStr = ' + formattedStr)
 
 // let date = new Date()
