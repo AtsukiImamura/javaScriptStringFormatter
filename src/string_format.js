@@ -52,6 +52,7 @@ function formatString(str, ...args) {
                         // Error
                     }
                     formatedArg = Math.floor(Number(arg)) + ''
+                    break
                 case 'o':
                     formatedArg = arg.toString(8)
                     break
@@ -74,7 +75,7 @@ function formatString(str, ...args) {
                 let minLength = 0
 
                 // [最小フィールド幅]
-                if (match.match(/[^\.0-9]+[1-9][0-9]*[doxsbf]/)) {
+                if (match.match(/[^\.]+[1-9][0-9]*[doxsbf]/)) {
                     let s = match.search(/[1-9][0-9]*[doxsbf]/)
                     minLength = Number(match.substring(s, match.length - 1))
                 }
@@ -98,19 +99,20 @@ function formatString(str, ...args) {
                 }
 
                 let stuff = ' '
-                if(false){
+                if(match.match(/0[1-9][0-9]*(\.[1-9][0-9]*)?[doxsbf]/)){
                     stuff = '0'
                 }
 
                 let repeatNum = minLength - formatedArg.length // パッドを繰り返すべき回数
+                console.log('match = '+match+'  repeatNum = '+repeatNum+'  minLength = '+minLength)
 
                 // 右寄せ
-                if (match.match(/-.*s/)) {
-                    formatedArg = ' '.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
+                if (match.match(/-.*[doxsbf]/) || stuff == '0') {
+                    formatedArg = stuff.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
                 }
                 // 左寄せ
                 else {
-                    formatedArg += ' '.repeat(repeatNum > 0 ? repeatNum : 0)
+                    formatedArg += stuff.repeat(repeatNum > 0 ? repeatNum : 0)
                 }
             }
 
@@ -123,7 +125,7 @@ function formatString(str, ...args) {
     return str
 }
 
-let formattedStr = formatString('hoge%-8.4s@@%.8x', 'xyzab', 1234)
+let formattedStr = formatString('hoge%-8.4s@@%08d', 'xyzab', 1234)
 console.log('formattedStr = ' + formattedStr)
 
 // let date = new Date()
