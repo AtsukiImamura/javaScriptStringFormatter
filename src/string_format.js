@@ -5,7 +5,7 @@ function formatString(str, ...args) {
         return str
     }
 
-    // 可変長引数の部分にどれだけ値が必要かを検査する
+    // インデックスごとに整理する。
     let pointedArgsList = { 'none': [] }
     matches.forEach((f, index) => {
         let ms = f.match(new RegExp('[0-9]+\@', "g"))
@@ -22,6 +22,7 @@ function formatString(str, ...args) {
         pointedArgsList[argIndex].push(index)
     })
 
+    // 必要な数の可変引数が与えられていない場合はエラーとする
     if (args.length < Object.keys(pointedArgsList).length) {
         return "args are not enough."
         // ERROR 
@@ -32,55 +33,25 @@ function formatString(str, ...args) {
         let pointedArgIndexList = pointedArgsList[pointIdx]
 
         pointedArgIndexList.forEach(matchIdx => {
-            // console.log(args)
             let arg = args[Number(matchIdx)]
             let match = matches[matchIdx]
-
             let formatedArg = null;
 
-            // 書式指定子ごとに処理する
+
+            // 書式指定子ごとに必要な処理を施す
             let formatType = match.substr(match.length - 1, 1)
             switch (formatType) {
                 case 'f': // 小数
-                case 'd': // 整数
-                    formatedArg = Number(arg)
-                    if(formatType == 'd'){
-                        formatedArg = Math.floor(formatedArg)
+                    if (typeof arg != 'number') {
+                        // Error
                     }
-                    formatedArg = formatedArg + ''
-                    
-                    if (match.match(/[1-9][0-9]*[df]/)) {
-
-                        let stuff = ' '; // パッド
-                        let s = match.search(/[1-9][0-9]*[df]/) // フォーマット後の出力長を定義している文字列開始位置
-                        let totalLength = Number(match.substring(s, match.length - 1)) // フォーマット後の出力長
-                        let repeatNum = totalLength - formatedArg.length // パッドを繰り返すべき回数
-
-                        // ゼロ埋め
-                        if (match.match(/0[1-9][0-9]*[df]/)) {
-                            stuff = '0'
-                            formatedArg = stuff.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
-
-                        }
-                        // スペース埋め
-                        else {
-                            // 左寄せ
-                            if (match.match(/-.*[df]/)) {
-                                formatedArg = stuff.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
-                            }
-                            // 右寄せ
-                            else {
-                                formatedArg += stuff.repeat(repeatNum > 0 ? repeatNum : 0)
-                            }
-                        }
-                        // 精度（最大表示幅）指定がある場合はカットする
-                        if (match.match(/\.[1-9][0-9]*[df]/)) {
-                            formatedArg = formatedArg.substr(0, totalLength)
-                        }
-                    } else {
-
-                    }
+                    formatedArg = Number(arg) + ''
                     break
+                case 'd': // 整数
+                    if (typeof arg != 'number') {
+                        // Error
+                    }
+                    formatedArg = Math.floor(Number(arg)) + ''
                 case 'o':
                     break
                 case 'x':
@@ -90,39 +61,62 @@ function formatString(str, ...args) {
                         // Error
                     }
                     formatedArg = arg
-
-                    if (match.match(/[1-9][0-9]*s/)) {
-                        let s = match.search(/[1-9][0-9]*s/) // フォーマット後の出力長を定義している文字列開始位置
-                        let totalLength = Number(match.substring(s, match.length - 1)) // フォーマット後の出力長
-                        let repeatNum = totalLength - formatedArg.length // パッドを繰り返すべき回数
-
-                        if (match.match(/-.*s/)) {
-                            formatedArg = ' '.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
-                        }
-                        // 右寄せ
-                        else {
-                            formatedArg += ' '.repeat(repeatNum > 0 ? repeatNum : 0)
-                        }
-
-                        if (match.match(/\.[1-9][0-9]*s/)) {
-                            formatedArg = formatedArg.substr(0, totalLength)
-                        }
-                    }
-
                     break
                 default:
                 // ERROR
             }
+
+            // フィールド幅指定がある場合は調整する
+            if(match.match(/[1-9][0-9]*[doxsbf]/)){
+                let maxLength = 0
+                let minLength = 0
+
+                // [最小フィールド幅]
+                if (match.match(/[^\.0-9]+[1-9][0-9]*[doxsbf]/)) {
+                    let s = match.search(/[1-9][0-9]*[doxsbf]/)
+                    minLength = Number(match.substring(s, match.length - 1))
+                }
+                // [最大フィールド幅] & [最小フィールド幅]
+                else if(match.match(/[1-9][0-9]*\.[1-9][0-9]*[doxsbf]/)){
+                    let sMax = match.search(/[1-9][0-9]*[doxsbf]/)
+                    maxLength = Number(match.substring(sMax, match.length - 1))
+                    
+                    let minMatch = match.match(/[1-9][0-9]*\./)[0] // 必ずある想定
+                    minLength = Number(minMatch.substring(0, minMatch.length - 1))
+                }
+                // [最大フィールド幅]
+                else {
+                    let sMax = match.search(/\.[1-9][0-9]*[doxsbf]/)
+                    maxLength = Number(match.substring(sMax + 1, match.length - 1))
+                }
+
+                // 最初に入力の長さを制限
+                if(maxLength > 0){
+                    formatedArg = formatedArg.substr(0, maxLength)    
+                }
+
+                let repeatNum = minLength - formatedArg.length // パッドを繰り返すべき回数
+
+                // 右寄せ
+                if (match.match(/-.*s/)) {
+                    formatedArg = ' '.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
+                }
+                // 左寄せ
+                else {
+                    formatedArg += ' '.repeat(repeatNum > 0 ? repeatNum : 0)
+                }
+            }
+
+            // 書式指定子と置換
             let matchStartAt = str.search(match)
             str = str.substring(0, matchStartAt) + formatedArg + str.substring(matchStartAt + match.length)
         })
     })
 
-
     return str
 }
 
-let formattedStr = formatString('hoge%-6.4s*%.6f', 'foobarbaz', 1234.567890)
+let formattedStr = formatString('hoge%-8.4s@@%.8f', 'xyzab', 1234.567890)
 console.log('formattedStr = ' + formattedStr)
 
 // let date = new Date()
