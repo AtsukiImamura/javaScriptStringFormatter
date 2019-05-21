@@ -7,8 +7,8 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, './dest'),
-        filename: '[name].bundle.js',
-        chunkFilename: '[name].bundle.js',
+        filename: '[name].js',
+        chunkFilename: '[name].js',
     },
     // devServer: {
     //     // webpackの扱わないファイル(HTMLや画像など)が入っているディレクトリ

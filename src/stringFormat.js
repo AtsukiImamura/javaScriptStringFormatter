@@ -1,4 +1,4 @@
-export default function(str, ...args) {
+export default function stringFormat(str, ...args) {
 
     let matches = str.match(new RegExp('\%([0-9]+\@)?(#[ox])?[-0]?([1-9][0-9]*)?(\.?[1-9][0-9]*)?[doxsbf]', "g"))
     if (matches == null || matches.length == 0) {
@@ -70,7 +70,7 @@ export default function(str, ...args) {
             }
 
             // フィールド幅指定がある場合は調整する
-            if(match.match(/[1-9][0-9]*[doxsbf]/)){
+            if (match.match(/[1-9][0-9]*[doxsbf]/)) {
                 let maxLength = 0
                 let minLength = 0
 
@@ -80,10 +80,10 @@ export default function(str, ...args) {
                     minLength = Number(match.substring(s, match.length - 1))
                 }
                 // [最大フィールド幅] & [最小フィールド幅]
-                else if(match.match(/[1-9][0-9]*\.[1-9][0-9]*[doxsbf]/)){
+                else if (match.match(/[1-9][0-9]*\.[1-9][0-9]*[doxsbf]/)) {
                     let sMax = match.search(/[1-9][0-9]*[doxsbf]/)
                     maxLength = Number(match.substring(sMax, match.length - 1))
-                    
+
                     let minMatch = match.match(/[1-9][0-9]*\./)[0] // 必ずある想定
                     minLength = Number(minMatch.substring(0, minMatch.length - 1))
                 }
@@ -94,8 +94,8 @@ export default function(str, ...args) {
                 }
 
                 // 最初に入力の長さを制限
-                if(maxLength > 0){
-                    formatedArg = formatedArg.substr(0, maxLength)    
+                if (maxLength > 0) {
+                    formatedArg = formatedArg.substr(0, maxLength)
                 }
 
                 let repeatNum = minLength - formatedArg.length // パッドを繰り返すべき回数
@@ -105,7 +105,7 @@ export default function(str, ...args) {
                     formatedArg = ' '.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
                 }
                 // ゼロ埋め（&右詰め）
-                else if(match.match(/0[1-9][0-9]*(\.[1-9][0-9]*)?[doxsbf]/)){
+                else if (match.match(/0[1-9][0-9]*(\.[1-9][0-9]*)?[doxsbf]/)) {
                     formatedArg = '0'.repeat(repeatNum > 0 ? repeatNum : 0) + formatedArg
                 }
                 // 左寄せ

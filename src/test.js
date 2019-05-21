@@ -1,13 +1,53 @@
-import stringFormat from './stringFormat'
+import stringFormat from './stringFormat.js'
+import assert from 'assert'
 
-let formattedStr = stringFormat('hoge%-8.4s@@%08d', 'xyzab', 1234)
-console.log('formattedStr = ' + formattedStr)
+describe('string format', function () {
+    describe('integer', function () {
+        it('should create a string based on format [1]', function () {
+            assert.equal(stringFormat('hoge%-8.4s@@%08d', 'xyzab', 1234), 'hoge    xyza@@00001234')
+        })
+        it('should create a string based on format [2]', function () {
+            assert.equal(stringFormat('hoge%.4dpiyo', 12345678), 'hoge1234piyo')
+        })
+        it('should create a string based on format [3]', function () {
+            assert.equal(stringFormat('hoge%-6.4dpiyo', 12345678), 'hoge  1234piyo')
+        })
+        it('should create a string based on format [4]', function () {
+            assert.equal(stringFormat('hoge%09.6dpiyo', 12345678), 'hoge000123456piyo')
+        })
+    })
+    describe('float', function () {
+        it('should create a string based on format', function () {
+            assert.equal(stringFormat('hoge%-8.4s@@%08d', 'xyzab', 1234), 'hoge    xyza@@00001234')
+        })
+    })
+    describe('string', function () {
+        it('should create a string based on format [1]', function () {
+            assert.equal(stringFormat('hoge%-8.4s@@', 'xyzab'), 'hoge    xyza@@')
+        })
+        it('should create a string based on format [2]', function () {
+            assert.equal(stringFormat('hoge%8.4s@@', 'xyzab'), 'hogexyza    @@')
+        })
+        it('should create a string based on format [3]', function () {
+            assert.equal(stringFormat('hoge%.4s@@', 'xyzab'), 'hogexyza@@')
+        })
+        it('should create a string based on format [4]', function () {
+            assert.equal(stringFormat('hoge%.6s@@', 'xyzab'), 'hogexyzab@@')
+        })
+        it('should create a string based on format [5]', function () {
+            assert.equal(stringFormat('hoge%08.4s@@', 'xyzab'), 'hoge0000xyza@@')
+        })
+    })
 
-// let date = new Date()
-// console.log('[start] '+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()+':'+date.getMilliseconds())
-// for(let i = 0; i < 200000; i++){
-//     let formattedStr = formatString('hoge%-6.4s*%12f', 'foobarbaz', 1234.567890)
-// }
+    describe('Hexadecimal', function () {
+        it('should create a string based on format', function () {
+            assert.equal(stringFormat('hoge%-8.4s@@%08d', 'xyzab', 1234), 'hoge    xyza@@00001234')
+        })
+    })
 
-// date = new Date()
-// console.log('[start] '+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()+':'+date.getMilliseconds())
+    describe('Octal', function () {
+        it('should create a string based on format', function () {
+            assert.equal(stringFormat('hoge%-8.4s@@%08d', 'xyzab', 1234), 'hoge    xyza@@00001234')
+        })
+    })
+})
