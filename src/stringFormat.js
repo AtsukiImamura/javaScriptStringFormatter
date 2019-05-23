@@ -24,7 +24,7 @@ export default function stringFormat(str, ...args) {
 
     // 必要な数の可変引数が与えられていない場合はエラーとする
     if (args.length < Object.keys(pointedArgsList).length) {
-        return "args are not enough."
+        throw new Exception("args are not enough.")
         // ERROR 
     }
 
@@ -43,13 +43,13 @@ export default function stringFormat(str, ...args) {
             switch (formatType) {
                 case 'f': // 小数
                     if (typeof arg != 'number') {
-                        // Error
+                        throw new Exception("arg [" + matchIdx + "] must be a number.")
                     }
                     formatedArg = Number(arg) + ''
                     break
                 case 'd': // 整数
                     if (typeof arg != 'number') {
-                        // Error
+                        throw new Exception("arg [" + matchIdx + "] must be a number.")
                     }
                     formatedArg = Math.floor(Number(arg)) + ''
                     break
@@ -61,12 +61,12 @@ export default function stringFormat(str, ...args) {
                     break
                 case 's': // 文字列
                     if (typeof arg != 'string') {
-                        // Error
+                        throw new Exception("arg [" + matchIdx + "] must be a string value.")
                     }
                     formatedArg = arg
                     break
                 default:
-                // ERROR
+                    throw new Exception("Some thing is wrong....")
             }
 
             // フィールド幅指定がある場合は調整する
